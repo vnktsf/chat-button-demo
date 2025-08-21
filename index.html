@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Demo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <button id="chatBtn">Chat</button>
+  </div>
+  
+  <script>
+    let chatLoaded = false;
+    function loadChatScript() {
+      if (chatLoaded) return; // Prevent loading twice
+      chatLoaded = true;
+
+      // Salesforce Embedded Messaging code
+      window.initEmbeddedMessaging = function() {
+        try {
+          embeddedservice_bootstrap.settings.language = 'en_US';
+          embeddedservice_bootstrap.init(
+            '00Daj00000P73di',
+            'test12345',
+            'https://gerent-14a-dev-ed.develop.my.site.com/ESWtest123451755774409957',
+            {
+              scrt2URL: 'https://gerent-14a-dev-ed.develop.my.salesforce-scrt.com'
+            }
+          );
+        } catch (err) {
+          console.error('Error loading Embedded Messaging: ', err);
+        }
+      };
+
+      // Add the script to the page
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = 'https://gerent-14a-dev-ed.develop.my.site.com/ESWtest123451755774409957/assets/js/bootstrap.min.js';
+      script.onload = window.initEmbeddedMessaging;
+      document.body.appendChild(script);
+    }
+
+    document.getElementById('chatBtn').addEventListener('click', loadChatScript);
+  </script>
+</body>
+</html>
