@@ -1,0 +1,29 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  text-align: center;
+  margin-top: 100px;
+}
+
+#chatBtn {
+  padding: 16px 36px;
+  font-size: 1.25rem;
+  background: #0052cc;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#chatBtn:hover {
+  background: #003d99;
+}
