@@ -9,36 +9,41 @@
   <div class="container">
     <button id="chatBtn">Chat</button>
   </div>
-  
   <script>
     let chatLoaded = false;
     function loadChatScript() {
-      if (chatLoaded) return; // Prevent loading twice
+      if (chatLoaded) return;
       chatLoaded = true;
 
-      // Salesforce Embedded Messaging code
-      window.initEmbeddedMessaging = function() {
-        try {
-          embeddedservice_bootstrap.settings.language = 'en_US';
-          embeddedservice_bootstrap.init(
-            '00Daj00000P73di',
-            'test12345',
-            'https://gerent-14a-dev-ed.develop.my.site.com/ESWtest123451755774409957',
-            {
-              scrt2URL: 'https://gerent-14a-dev-ed.develop.my.salesforce-scrt.com'
-            }
-          );
-        } catch (err) {
-          console.error('Error loading Embedded Messaging: ', err);
+      // Add Salesforce Embedded Messaging initialization and script
+      const initScript = document.createElement('script');
+      initScript.type = 'text/javascript';
+      initScript.text = `
+        function initEmbeddedMessaging() {
+          try {
+            embeddedservice_bootstrap.settings.language = 'en_US';
+            embeddedservice_bootstrap.init(
+              '00Daj00000P73di',
+              'githubdemo',
+              'https://gerent-14a-dev-ed.develop.my.site.com/ESWgithubdemo1755775359317',
+              { scrt2URL: 'https://gerent-14a-dev-ed.develop.my.salesforce-scrt.com' }
+            );
+          } catch (err) {
+            console.error('Error loading Embedded Messaging: ', err);
+          }
+        };
+      `;
+      document.body.appendChild(initScript);
+
+      const salesforceScript = document.createElement('script');
+      salesforceScript.type = 'text/javascript';
+      salesforceScript.src = 'https://gerent-14a-dev-ed.develop.my.site.com/ESWgithubdemo1755775359317/assets/js/bootstrap.min.js';
+      salesforceScript.onload = function() {
+        if (typeof initEmbeddedMessaging === "function") {
+          initEmbeddedMessaging();
         }
       };
-
-      // Add the script to the page
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = 'https://gerent-14a-dev-ed.develop.my.site.com/ESWtest123451755774409957/assets/js/bootstrap.min.js';
-      script.onload = window.initEmbeddedMessaging;
-      document.body.appendChild(script);
+      document.body.appendChild(salesforceScript);
     }
 
     document.getElementById('chatBtn').addEventListener('click', loadChatScript);
