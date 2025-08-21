@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Demo (Static Resource)</title>
+
+  <!-- Load CSS from Salesforce Static Resource (inside ZIP) -->
+  <link rel="stylesheet" href="https://gerent-14a-dev-ed.develop.my.site.com/resource/chatdemo/style.css" 
+        onload="console.log('CSS loaded from static resource!')" 
+        onerror="console.error('Failed to load CSS from static resource!')">
+</head>
+<body>
+  <div class="container">
+    <button id="chatBtn">💬 Chat</button>
+  </div>
+
+  <!-- Load JS from Salesforce Static Resource (inside ZIP) -->
+  <script src="https://gerent-14a-dev-ed.develop.my.site.com/resource/chatdemo/main.js"
+          onload="console.log('JS loaded from static resource!')"
+          onerror="console.error('Failed to load JS from static resource!')"></script>
+
+  <script>
+    // Logging for DOM and button setup
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM fully loaded');
+
+      const chatBtn = document.getElementById('chatBtn');
+      if (chatBtn) {
+        console.log('Chat button found:', chatBtn);
+        chatBtn.addEventListener('click', function() {
+          console.log('Chat button clicked! Attempting to load chat script...');
+          if (typeof loadChatScript === 'function') {
+            loadChatScript();
+            console.log('loadChatScript() called successfully.');
+          } else {
+            console.error('loadChatScript() is not defined!');
+          }
+        });
+      } else {
+        console.error('Chat button not found in DOM!');
+      }
+    });
+  </script>
+
+  <noscript>
+    <p>Chat is unavailable because JavaScript is disabled in your browser.</p>
+  </noscript>
+</body>
+</html>
