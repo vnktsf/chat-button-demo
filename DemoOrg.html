@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Webpage with Embedded Messaging</title>
+    <title>Click-to-Chat Example</title>
     <style>
         body {
             font-family: sans-serif;
@@ -12,28 +12,49 @@
             background-color: #f0f0f0;
         }
 
-        h1 {
-            color: #333;
+        .chat-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #0070d2; /* Salesforce blue */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        p {
-            color: #666;
+        .chat-button:hover {
+            background-color: #005fb2;
         }
-
-        /* The Salesforce chat window will appear in the bottom corner, so no specific CSS is needed for it. */
-        /* You can add custom styles for other elements of your page here. */
     </style>
 </head>
 <body>
 
     <h1>Welcome to My Website!</h1>
-    <p>We're here to help. Click the chat icon in the bottom right corner to start a conversation.</p>
+    <p>Click the button below to start a conversation with us.</p>
+
+    <button id="openChatButton" class="chat-button">Open Chat</button>
 
     <script type='text/javascript'>
         function initEmbeddedMessaging() {
             try {
-                embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
+                embeddedservice_bootstrap.settings.language = 'en_US'; 
 
+                // We don't call .init() here. We'll call it when the button is clicked.
+                // The library itself will be loaded, but the chat will remain hidden.
+
+            } catch (err) {
+                console.error('Error loading Embedded Messaging: ', err);
+            }
+        };
+    </script>
+    <script type='text/javascript' src='https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+
+    <script type="text/javascript">
+        // This is the new script to handle the button click.
+        document.getElementById('openChatButton').addEventListener('click', function() {
+            // Check if the embedded service is ready before initializing the chat.
+            if (typeof embeddedservice_bootstrap !== 'undefined') {
                 embeddedservice_bootstrap.init(
                     '00DgL00000098b7',
                     'githubPOC',
@@ -42,12 +63,9 @@
                         scrt2URL: 'https://orgfarm-699ab99d32-dev-ed.develop.my.salesforce-scrt.com'
                     }
                 );
-            } catch (err) {
-                console.error('Error loading Embedded Messaging: ', err);
             }
-        };
+        });
     </script>
-    <script type='text/javascript' src='https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
 
 </body>
 </html>
