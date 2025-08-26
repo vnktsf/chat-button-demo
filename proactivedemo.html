@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click-to-Chat Example</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to My Website!</h1>
+    <p>The chat will open automatically.</p>
+
+    <script type='text/javascript'>
+        function initEmbeddedMessaging() {
+            try {
+                embeddedservice_bootstrap.settings.language = 'en_US';
+
+                // Initialize the chat immediately
+                embeddedservice_bootstrap.init(
+                    '00DgL00000098b7',
+                    'githubPOC',
+                    'https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250',
+                    {
+                        scrt2URL: 'https://orgfarm-699ab99d32-dev-ed.develop.my.salesforce-scrt.com'
+                    }
+                );
+
+                // Launch the chat automatically after a short delay
+                setTimeout(() => {
+                    if (typeof embeddedservice_bootstrap.utilAPI !== 'undefined') {
+                        embeddedservice_bootstrap.utilAPI.launchChat().then(success => {
+                            console.log('Chat launched successfully:', success);
+                        }).catch(error => {
+                            console.error('Error launching chat:', error);
+                        });
+                    } else {
+                        console.error('Embedded Messaging utilAPI not available.');
+                    }
+                }, 1000); // 1-second delay to ensure initialization completes
+
+            } catch (err) {
+                console.error('Error initializing Embedded Messaging: ', err);
+            }
+        };
+    </script>
+    <script type='text/javascript' src='https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+</body>
+</html>
