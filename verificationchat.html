@@ -12,17 +12,17 @@
 
     <script type='text/javascript'>
         function loadExternalScript(src, callback) {
-            console.log('[DEBUG] [2025-08-26 16:50 EDT] Loading external script:', src);
+            console.log('[DEBUG] [2025-08-26 16:58 EDT] Loading external script:', src);
             const script = document.createElement('script');
             script.type = 'text/javascript';
             script.src = src;
             script.id = 'proactiveChatScript';
             script.onload = () => {
-                console.log('[DEBUG] [2025-08-26 16:50 EDT] External script loaded successfully.');
+                console.log('[DEBUG] [2025-08-26 16:58 EDT] External script loaded successfully.');
                 callback();
             };
             script.onerror = () => {
-                console.error('[ERROR] [2025-08-26 16:50 EDT] Failed to load script:', src);
+                console.error('[ERROR] [2025-08-26 16:58 EDT] Failed to load script:', src);
             };
             document.head.appendChild(script);
         }
@@ -34,6 +34,7 @@
                 this.cancelText = cancelText;
                 this.chatText = chatText;
                 this.isUserVerificationEnabled = false;
+                this.isInitialized = false;
             }
 
             generateStyles() {
@@ -72,7 +73,7 @@
             }
 
             createProactiveChat() {
-                console.log('[DEBUG] [2025-08-26 16:50 EDT] Creating proactive chat UI...');
+                console.log('[DEBUG] [2025-08-26 16:58 EDT] Creating proactive chat UI...');
                 document.head.insertAdjacentHTML('beforeend', this.generateStyles());
                 const proactiveChatContainer = document.createElement('div');
                 proactiveChatContainer.classList.add('proactive-chat-container');
@@ -85,91 +86,107 @@
                 `;
                 document.body.appendChild(proactiveChatContainer);
                 setTimeout(() => {
-                    console.log('[DEBUG] [2025-08-26 16:50 EDT] Showing proactive chat UI after delay...');
+                    console.log('[DEBUG] [2025-08-26 16:58 EDT] Showing proactive chat UI after delay...');
                     proactiveChatContainer.classList.add('visible');
                 }, this.chatDelay);
                 setTimeout(() => {
-                    console.log('[DEBUG] [2025-08-26 16:50 EDT] Auto-hiding proactive chat UI...');
+                    console.log('[DEBUG] [2025-08-26 16:58 EDT] Auto-hiding proactive chat UI...');
                     this.hideProactiveChat();
                 }, this.chatDelay + 10000);
             }
 
             initEmbeddedProactiveMessaging(orgId, buttonName, baseUrl, scrt2URL) {
-                console.log('[DEBUG] [2025-08-26 16:50 EDT] Initializing Embedded Messaging with parameters:', { orgId, buttonName, baseUrl });
+                console.log('[DEBUG] [2025-08-26 16:58 EDT] Initializing Embedded Messaging with parameters:', { orgId, buttonName, baseUrl });
                 try {
                     embeddedservice_bootstrap.init(orgId, buttonName, baseUrl, {
                         scrt2URL: scrt2URL,
-                        targetElement: '#chat-messages'
+                        targetElement: '#chat-messages',
+                        language: 'en_US' // Explicitly set language to avoid undefined
                     });
-                    console.log('[DEBUG] [2025-08-26 16:50 EDT] Embedded Messaging initialized successfully.');
+                    console.log('[DEBUG] [2025-08-26 16:58 EDT] Embedded Messaging initialized successfully.');
+                    this.isInitialized = true;
                 } catch (err) {
-                    console.error('[ERROR] [2025-08-26 16:50 EDT] Error initializing Embedded Messaging:', err);
+                    console.error('[ERROR] [2025-08-26 16:58 EDT] Error initializing Embedded Messaging:', err);
+                    console.warn('[WARN] [2025-08-26 16:58 EDT] Embedded Messaging initialization failed, likely due to configuration error (400 Bad Request). Check Embedded Service Deployment settings.');
+                    this.isInitialized = false;
                 }
             }
 
             launchProactiveChat() {
-                console.log('[DEBUG] [2025-08-26 16:50 EDT] Attempting to launch chat...');
+                if (!this.isInitialized) {
+                    console.warn('[WARN] [2025-08-26 16:58 EDT] Cannot launch chat: Embedded Messaging not initialized.');
+                    return;
+                }
+                console.log('[DEBUG] [2025-08-26 16:58 EDT] Attempting to launch chat...');
                 try {
                     embeddedservice_bootstrap.utilAPI.launchChat().then(success => {
-                        console.log('[DEBUG] [2025-08-26 16:50 EDT] Chat launched successfully:', success);
+                        console.log('[DEBUG] [2025-08-26 16:58 EDT] Chat launched successfully:', success);
                         this.hideProactiveChat();
                     }).catch(error => {
-                        console.error('[ERROR] [2025-08-26 16:50 EDT] Error launching chat:', error);
+                        console.error('[ERROR] [2025-08-26 16:58 EDT] Error launching chat:', error);
                     });
                 } catch (err) {
-                    console.error('[ERROR] [2025-08-26 16:50 EDT] Error launching chat:', err);
+                    console.error('[ERROR] [2025-08-26 16:58 EDT] Error launching chat:', err);
                 }
             }
 
             setIdentityToken(identityToken) {
-                console.log('[DEBUG] [2025-08-26 16:50 EDT] Setting identity token...');
+                if (!this.isInitialized) {
+                    console.warn('[WARN] [2025-08-26 16:58 EDT] Cannot set identity token: Embedded Messaging not initialized.');
+                    return;
+                }
+                console.log('[DEBUG] [2025-08-26 16:58 EDT] Setting identity token...');
                 try {
                     if (embeddedservice_bootstrap.userVerificationAPI) {
                         embeddedservice_bootstrap.userVerificationAPI.setIdentityToken({
                             identityTokenType: 'JWT',
                             identityToken: identityToken
                         });
-                        console.log('[DEBUG] [2025-08-26 16:50 EDT] Identity token set successfully.');
+                        console.log('[DEBUG] [2025-08-26 16:58 EDT] Identity token set successfully.');
                         this.isUserVerificationEnabled = true;
                     } else {
-                        console.warn('[WARN] [2025-08-26 16:50 EDT] userVerificationAPI not available. User Verification not supported in Developer Edition (only Customer User Interface, Terms and Conditions, Business Hours available).');
+                        console.warn('[WARN] [2025-08-26 16:58 EDT] userVerificationAPI not available. User Verification not supported in Developer Edition (only Customer User Interface, Terms and Conditions, Business Hours available).');
                         this.isUserVerificationEnabled = false;
                     }
                 } catch (err) {
-                    console.error('[ERROR] [2025-08-26 16:50 EDT] Error setting identity token:', err);
-                    console.warn('[WARN] [2025-08-26 16:50 EDT] User verification failed, likely due to missing JSON Web Key Sets or User Verification settings in Developer Edition.');
+                    console.error('[ERROR] [2025-08-26 16:58 EDT] Error setting identity token:', err);
+                    console.warn('[WARN] [2025-08-26 16:58 EDT] User verification failed, likely due to missing JSON Web Key Sets or User Verification settings in Developer Edition.');
                     this.isUserVerificationEnabled = false;
                 }
             }
 
             clearSession() {
-                console.log('[DEBUG] [2025-08-26 16:50 EDT] Clearing session...');
+                if (!this.isInitialized) {
+                    console.warn('[WARN] [2025-08-26 16:58 EDT] Cannot clear session: Embedded Messaging not initialized.');
+                    return;
+                }
+                console.log('[DEBUG] [2025-08-26 16:58 EDT] Clearing session...');
                 try {
                     if (embeddedservice_bootstrap.userVerificationAPI) {
                         embeddedservice_bootstrap.userVerificationAPI.clearSession();
-                        console.log('[DEBUG] [2025-08-26 16:50 EDT] Session cleared successfully.');
+                        console.log('[DEBUG] [2025-08-26 16:58 EDT] Session cleared successfully.');
                     } else {
-                        console.warn('[WARN] [2025-08-26 16:50 EDT] userVerificationAPI not available for clearSession.');
+                        console.warn('[WARN] [2025-08-26 16:58 EDT] userVerificationAPI not available for clearSession.');
                     }
                 } catch (err) {
-                    console.error('[ERROR] [2025-08-26 16:50 EDT] Error clearing session:', err);
+                    console.error('[ERROR] [2025-08-26 16:58 EDT] Error clearing session:', err);
                 }
             }
 
             hideProactiveChat() {
-                console.log('[DEBUG] [2025-08-26 16:50 EDT] Hiding proactive chat UI...');
+                console.log('[DEBUG] [2025-08-26 16:58 EDT] Hiding proactive chat UI...');
                 const proactiveChatContainer = document.querySelector('.proactive-chat-container');
                 if (proactiveChatContainer) {
                     proactiveChatContainer.style.bottom = '-200px';
                     setTimeout(() => {
                         proactiveChatContainer.style.display = 'none';
-                        console.log('[DEBUG] [2025-08-26 16:50 EDT] Proactive chat UI hidden.');
+                        console.log('[DEBUG] [2025-08-26 16:58 EDT] Proactive chat UI hidden.');
                     }, 500);
                 }
                 const script = document.getElementById('proactiveChatScript');
                 if (script) {
                     script.remove();
-                    console.log('[DEBUG] [2025-08-26 16:50 EDT] External script unloaded.');
+                    console.log('[DEBUG] [2025-08-26 16:58 EDT] External script unloaded.');
                 }
             }
         }
@@ -178,28 +195,28 @@
 
         function initProactive() {
             try {
-                console.log('[DEBUG] [2025-08-26 16:50 EDT] Starting proactive chat initialization...');
+                console.log('[DEBUG] [2025-08-26 16:58 EDT] Starting proactive chat initialization...');
                 const chatLogo = 'https://example.com/your-logo.png'; // Replace with actual logo URL
                 const chatDelay = 5000;
                 proactiveChat = new ProactiveChat(chatLogo, chatDelay, 'Cancel', 'Chat');
 
                 window.addEventListener('onEmbeddedMessagingReady', () => {
-                    console.log('[DEBUG] [2025-08-26 16:50 EDT] onEmbeddedMessagingReady event received. API is ready.');
+                    console.log('[DEBUG] [2025-08-26 16:58 EDT] onEmbeddedMessagingReady event received. API is ready.');
                     // Placeholder JWT; replace with JWT signed using Certificate and Key Management
-                    const identityToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1JQVdUZXN0Q2VydCJ9.eyJzdWIiOiJ1c2VyMTIzQGV4YW1wbGUuY29tIiwiaXNzIjoiU0YiLCJleHAiOjE3NDA4NzUxMDB9.SignatureHere';
+                    const identityToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1JQVdUZXN0Q2VydCJ9.eyJzdWIiOiJ1c2VyMTIzQGV4YW1wbGUuY29tIiwiaXNzIjoiU0YiLCJleHAiOjE3NDA4NzcwODB9.SignatureHere';
                     proactiveChat.setIdentityToken(identityToken);
-                    if (proactiveChat.isUserVerificationEnabled) {
-                        console.log('[DEBUG] [2025-08-26 16:50 EDT] User verification enabled. Launching chat...');
+                    if (proactiveChat.isInitialized && proactiveChat.isUserVerificationEnabled) {
+                        console.log('[DEBUG] [2025-08-26 16:58 EDT] User verification enabled. Launching chat...');
                         proactiveChat.launchProactiveChat();
                     } else {
-                        console.warn('[WARN] [2025-08-26 16:50 EDT] User verification not enabled, likely due to Developer Edition limitations (only Customer User Interface, Terms and Conditions, Business Hours available). Launching chat without verification...');
+                        console.warn('[WARN] [2025-08-26 16:58 EDT] User verification not enabled or initialization failed, likely due to Developer Edition limitations (only Customer User Interface, Terms and Conditions, Business Hours available). Attempting to launch chat without verification...');
                         proactiveChat.launchProactiveChat();
                     }
                 });
 
                 window.addEventListener('onEmbeddedMessagingIdentityTokenExpired', () => {
-                    console.warn('[WARN] [2025-08-26 16:50 EDT] Identity token expired. Attempting to generate new token...');
-                    const newIdentityToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1JQVdUZXN0Q2VydCJ9.eyJzdWIiOiJ1c2VyMTIzQGV4YW1wbGUuY29tIiwiaXNzIjoiU0YiLCJleHAiOjE3NDA4Nzg3MDB9.NewSignatureHere';
+                    console.warn('[WARN] [2025-08-26 16:58 EDT] Identity token expired. Attempting to generate new token...');
+                    const newIdentityToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1JQVdUZXN0Q2VydCJ9.eyJzdWIiOiJ1c2VyMTIzQGV4YW1wbGUuY29tIiwiaXNzIjoiU0YiLCJleHAiOjE3NDA4ODA2ODB9.NewSignatureHere';
                     proactiveChat.setIdentityToken(newIdentityToken);
                 });
 
@@ -211,23 +228,20 @@
                     'https://orgfarm-699ab99d32-dev-ed.develop.my.salesforce-scrt.com' // Secure URL
                 );
             } catch (err) {
-                console.error('[ERROR] [2025-08-26 16:50 EDT] Error initializing proactive chat:', err);
+                console.error('[ERROR] [2025-08-26 16:58 EDT] Error initializing proactive chat:', err);
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('[DEBUG] [2025-08-26 16:50 EDT] DOM content loaded. Loading bootstrap script...');
+            console.log('[DEBUG] [2025-08-26 16:58 EDT] DOM content loaded. Loading bootstrap script...');
             loadExternalScript('https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250/assets/js/bootstrap.min.js', initProactive);
         });
 
         // Optional: Simulate logout after 30 seconds for testing
         setTimeout(() => {
-            console.log('[DEBUG] [2025-08-26 16:50 EDT] Simulating logout...');
+            console.log('[DEBUG] [2025-08-26 16:58 EDT] Simulating logout...');
             if (proactiveChat) {
                 proactiveChat.clearSession();
-                window.addEventListener('onEmbeddedMessagingReady', () => {
-                    console.log('[DEBUG] [2025-08-26 16:50 EDT] onEmbeddedMessagingReady event received after clearSession.');
-                });
             }
         }, 30000);
     </script>
