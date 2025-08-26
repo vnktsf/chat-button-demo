@@ -3,247 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proactive Chat with User Verification (Developer Edition)</title>
+    <title>Proactive Chat with User Verification and MIAW Invitation Animation</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f0f0f0;
+        }
+    </style>
 </head>
 <body>
     <h1>Welcome to My Website!</h1>
-    <p>A proactive chat prompt will appear, attempting user verification.</p>
-    <div id="chat-messages"></div>
+    <p>A proactive chat will appear after a short delay for verified users.</p>
 
     <script type='text/javascript'>
+        // Function to dynamically load external script
         function loadExternalScript(src, callback) {
-            console.log('[DEBUG] [2025-08-26 16:58 EDT] Loading external script:', src);
             const script = document.createElement('script');
             script.type = 'text/javascript';
             script.src = src;
             script.id = 'proactiveChatScript';
-            script.onload = () => {
-                console.log('[DEBUG] [2025-08-26 16:58 EDT] External script loaded successfully.');
-                callback();
-            };
-            script.onerror = () => {
-                console.error('[ERROR] [2025-08-26 16:58 EDT] Failed to load script:', src);
+            script.onload = callback;
+            script.onerror = function () {
+                console.error('Failed to load script:', src);
             };
             document.head.appendChild(script);
         }
 
+        // ProactiveChat class to manage the chat modal
         class ProactiveChat {
             constructor(chatLogo, chatDelay, cancelText, chatText) {
                 this.chatLogo = chatLogo;
                 this.chatDelay = chatDelay;
                 this.cancelText = cancelText;
                 this.chatText = chatText;
-                this.isUserVerificationEnabled = false;
-                this.isInitialized = false;
+                this.isVerified = false; // Track verification status
             }
 
+            // Generate CSS styles for the proactive chat modal
             generateStyles() {
                 return `
                     <style>
                         .proactive-chat-container {
                             position: fixed;
-                            bottom: -200px;
+                            bottom: 20px;
                             right: 20px;
                             width: 300px;
-                            background-color: #ffffff;
-                            border: 1px solid #ccc;
+                            background: #fff;
                             border-radius: 8px;
-                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                            font-family: Arial, sans-serif;
-                            transition: bottom 0.5s ease-in-out;
+                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                            overflow: hidden;
+                            transform: translateY(100%);
+                            transition: transform 0.5s ease-in-out;
                             z-index: 1000;
                         }
                         .proactive-chat-container.visible {
-                            bottom: 20px;
+                            transform: translateY(0);
                         }
                         .proactive-chat-header {
-                            background-color: #007bff;
-                            color: white;
+                            background: #007bff;
+                            color: #fff;
                             padding: 10px;
-                            border-top-left-radius: 8px;
-                            border-top-right-radius: 8px;
+                            font-size: 16px;
                             font-weight: bold;
+                            text-align: center;
                         }
-                        .proactive-chat-message {
-                            padding: 10px;
+                        .proactive-chat-body {
+                            padding: 15px;
+                            font-size: 14px;
                             color: #333;
+                        }
+                        .proactive-chat-buttons {
+                            display: flex;
+                            justify-content: space-between;
+                            padding: 10px;
+                        }
+                        .proactive-chat-button {
+                            padding: 8px 16px;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            transition: background 0.3s;
+                        }
+                        .cancel-button {
+                            background: #ccc;
+                            color: #333;
+                        }
+                        .cancel-button:hover {
+                            background: #aaa;
+                        }
+                        .chat-button {
+                            background: #007bff;
+                            color: #fff;
+                        }
+                        .chat-button:hover {
+                            background: #0056b3;
                         }
                     </style>
                 `;
             }
 
+            // Create the proactive chat modal
             createProactiveChat() {
-                console.log('[DEBUG] [2025-08-26 16:58 EDT] Creating proactive chat UI...');
+                // Inject styles
                 document.head.insertAdjacentHTML('beforeend', this.generateStyles());
+
+                // Create modal container
                 const proactiveChatContainer = document.createElement('div');
                 proactiveChatContainer.classList.add('proactive-chat-container');
                 proactiveChatContainer.innerHTML = `
                     <div class="proactive-chat-header">Need Help?</div>
-                    <div class="proactive-chat-message">
-                        <img src="${this.chatLogo}" alt="Chat Logo" style="width: 50px; height: 50px; display: block; margin: 0 auto 10px;">
-                        Hi! Connecting you to our support team...
+                    <div class="proactive-chat-body">Our team is here to assist you! Would you like to start a chat?</div>
+                    <div class="proactive-chat-buttons">
+                        <button class="proactive-chat-button cancel-button">${this.cancelText}</button>
+                        <button class="proactive-chat-button chat-button">${this.chatText}</button>
                     </div>
                 `;
                 document.body.appendChild(proactiveChatContainer);
+
+                // Event listeners for buttons
+                proactiveChatContainer.querySelector('.cancel-button').addEventListener('click', () => {
+                    this.hideProactiveChat();
+                });
+                proactiveChatContainer.querySelector('.chat-button').addEventListener('click', () => {
+                    if (this.isVerified) {
+                        this.launchProactiveChat();
+                    } else {
+                        console.warn('User not verified. Cannot launch chat.');
+                        alert('Please log in to start a chat.');
+                    }
+                });
+
+                // Show modal after delay, but only if verified
                 setTimeout(() => {
-                    console.log('[DEBUG] [2025-08-26 16:58 EDT] Showing proactive chat UI after delay...');
-                    proactiveChatContainer.classList.add('visible');
+                    if (this.isVerified) {
+                        proactiveChatContainer.classList.add('visible');
+                    }
                 }, this.chatDelay);
+
+                // Auto-hide after 10 seconds
                 setTimeout(() => {
-                    console.log('[DEBUG] [2025-08-26 16:58 EDT] Auto-hiding proactive chat UI...');
                     this.hideProactiveChat();
                 }, this.chatDelay + 10000);
             }
 
+            // Initialize Embedded Messaging
             initEmbeddedProactiveMessaging(orgId, buttonName, baseUrl, scrt2URL) {
-                console.log('[DEBUG] [2025-08-26 16:58 EDT] Initializing Embedded Messaging with parameters:', { orgId, buttonName, baseUrl });
                 try {
+                    embeddedservice_bootstrap.settings.language = 'en_US';
                     embeddedservice_bootstrap.init(orgId, buttonName, baseUrl, {
                         scrt2URL: scrt2URL,
-                        targetElement: '#chat-messages',
-                        language: 'en_US' // Explicitly set language to avoid undefined
+                        targetElement: '#chat-messages'
                     });
-                    console.log('[DEBUG] [2025-08-26 16:58 EDT] Embedded Messaging initialized successfully.');
-                    this.isInitialized = true;
                 } catch (err) {
-                    console.error('[ERROR] [2025-08-26 16:58 EDT] Error initializing Embedded Messaging:', err);
-                    console.warn('[WARN] [2025-08-26 16:58 EDT] Embedded Messaging initialization failed, likely due to configuration error (400 Bad Request). Check Embedded Service Deployment settings.');
-                    this.isInitialized = false;
+                    console.error('Error initializing Embedded Messaging:', err);
                 }
             }
 
+            // Launch the chat
             launchProactiveChat() {
-                if (!this.isInitialized) {
-                    console.warn('[WARN] [2025-08-26 16:58 EDT] Cannot launch chat: Embedded Messaging not initialized.');
-                    return;
-                }
-                console.log('[DEBUG] [2025-08-26 16:58 EDT] Attempting to launch chat...');
                 try {
                     embeddedservice_bootstrap.utilAPI.launchChat().then(success => {
-                        console.log('[DEBUG] [2025-08-26 16:58 EDT] Chat launched successfully:', success);
-                        this.hideProactiveChat();
+                        console.log('Chat launched successfully:', success);
+                        this.hideProactiveChat(); // Hide modal after launching chat
                     }).catch(error => {
-                        console.error('[ERROR] [2025-08-26 16:58 EDT] Error launching chat:', error);
+                        console.error('Error launching chat:', error);
                     });
                 } catch (err) {
-                    console.error('[ERROR] [2025-08-26 16:58 EDT] Error launching chat:', err);
+                    console.error('Error launching chat:', err);
                 }
             }
 
-            setIdentityToken(identityToken) {
-                if (!this.isInitialized) {
-                    console.warn('[WARN] [2025-08-26 16:58 EDT] Cannot set identity token: Embedded Messaging not initialized.');
-                    return;
-                }
-                console.log('[DEBUG] [2025-08-26 16:58 EDT] Setting identity token...');
-                try {
-                    if (embeddedservice_bootstrap.userVerificationAPI) {
-                        embeddedservice_bootstrap.userVerificationAPI.setIdentityToken({
-                            identityTokenType: 'JWT',
-                            identityToken: identityToken
-                        });
-                        console.log('[DEBUG] [2025-08-26 16:58 EDT] Identity token set successfully.');
-                        this.isUserVerificationEnabled = true;
-                    } else {
-                        console.warn('[WARN] [2025-08-26 16:58 EDT] userVerificationAPI not available. User Verification not supported in Developer Edition (only Customer User Interface, Terms and Conditions, Business Hours available).');
-                        this.isUserVerificationEnabled = false;
-                    }
-                } catch (err) {
-                    console.error('[ERROR] [2025-08-26 16:58 EDT] Error setting identity token:', err);
-                    console.warn('[WARN] [2025-08-26 16:58 EDT] User verification failed, likely due to missing JSON Web Key Sets or User Verification settings in Developer Edition.');
-                    this.isUserVerificationEnabled = false;
-                }
-            }
-
-            clearSession() {
-                if (!this.isInitialized) {
-                    console.warn('[WARN] [2025-08-26 16:58 EDT] Cannot clear session: Embedded Messaging not initialized.');
-                    return;
-                }
-                console.log('[DEBUG] [2025-08-26 16:58 EDT] Clearing session...');
-                try {
-                    if (embeddedservice_bootstrap.userVerificationAPI) {
-                        embeddedservice_bootstrap.userVerificationAPI.clearSession();
-                        console.log('[DEBUG] [2025-08-26 16:58 EDT] Session cleared successfully.');
-                    } else {
-                        console.warn('[WARN] [2025-08-26 16:58 EDT] userVerificationAPI not available for clearSession.');
-                    }
-                } catch (err) {
-                    console.error('[ERROR] [2025-08-26 16:58 EDT] Error clearing session:', err);
-                }
-            }
-
+            // Hide the proactive chat modal and unload script
             hideProactiveChat() {
-                console.log('[DEBUG] [2025-08-26 16:58 EDT] Hiding proactive chat UI...');
                 const proactiveChatContainer = document.querySelector('.proactive-chat-container');
                 if (proactiveChatContainer) {
-                    proactiveChatContainer.style.bottom = '-200px';
-                    setTimeout(() => {
-                        proactiveChatContainer.style.display = 'none';
-                        console.log('[DEBUG] [2025-08-26 16:58 EDT] Proactive chat UI hidden.');
-                    }, 500);
+                    proactiveChatContainer.style.display = 'none';
                 }
                 const script = document.getElementById('proactiveChatScript');
                 if (script) {
                     script.remove();
-                    console.log('[DEBUG] [2025-08-26 16:58 EDT] External script unloaded.');
+                    console.log('External script unloaded.');
                 }
             }
-        }
 
-        let proactiveChat;
-
-        function initProactive() {
-            try {
-                console.log('[DEBUG] [2025-08-26 16:58 EDT] Starting proactive chat initialization...');
-                const chatLogo = 'https://example.com/your-logo.png'; // Replace with actual logo URL
-                const chatDelay = 5000;
-                proactiveChat = new ProactiveChat(chatLogo, chatDelay, 'Cancel', 'Chat');
-
-                window.addEventListener('onEmbeddedMessagingReady', () => {
-                    console.log('[DEBUG] [2025-08-26 16:58 EDT] onEmbeddedMessagingReady event received. API is ready.');
-                    // Placeholder JWT; replace with JWT signed using Certificate and Key Management
-                    const identityToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1JQVdUZXN0Q2VydCJ9.eyJzdWIiOiJ1c2VyMTIzQGV4YW1wbGUuY29tIiwiaXNzIjoiU0YiLCJleHAiOjE3NDA4NzcwODB9.SignatureHere';
-                    proactiveChat.setIdentityToken(identityToken);
-                    if (proactiveChat.isInitialized && proactiveChat.isUserVerificationEnabled) {
-                        console.log('[DEBUG] [2025-08-26 16:58 EDT] User verification enabled. Launching chat...');
-                        proactiveChat.launchProactiveChat();
-                    } else {
-                        console.warn('[WARN] [2025-08-26 16:58 EDT] User verification not enabled or initialization failed, likely due to Developer Edition limitations (only Customer User Interface, Terms and Conditions, Business Hours available). Attempting to launch chat without verification...');
-                        proactiveChat.launchProactiveChat();
-                    }
-                });
-
-                window.addEventListener('onEmbeddedMessagingIdentityTokenExpired', () => {
-                    console.warn('[WARN] [2025-08-26 16:58 EDT] Identity token expired. Attempting to generate new token...');
-                    const newIdentityToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1JQVdUZXN0Q2VydCJ9.eyJzdWIiOiJ1c2VyMTIzQGV4YW1wbGUuY29tIiwiaXNzIjoiU0YiLCJleHAiOjE3NDA4ODA2ODB9.NewSignatureHere';
-                    proactiveChat.setIdentityToken(newIdentityToken);
-                });
-
-                proactiveChat.createProactiveChat();
-                proactiveChat.initEmbeddedProactiveMessaging(
-                    '00DgL00000098b7', // Organization ID
-                    'githubPOC', // Deployment Name
-                    'https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250', // Base URL
-                    'https://orgfarm-699ab99d32-dev-ed.develop.my.salesforce-scrt.com' // Secure URL
-                );
-            } catch (err) {
-                console.error('[ERROR] [2025-08-26 16:58 EDT] Error initializing proactive chat:', err);
+            // Set verification status
+            setVerified(status) {
+                this.isVerified = status;
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('[DEBUG] [2025-08-26 16:58 EDT] DOM content loaded. Loading bootstrap script...');
-            loadExternalScript('https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250/assets/js/bootstrap.min.js', initProactive);
+        // Function to generate or fetch JWT (server-side call example)
+        async function fetchJwtToken() {
+            try {
+                // Replace with your server-side endpoint to generate a JWT
+                const response = await fetch('https://your-server.com/generate-jwt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: 'current-user-id' }) // Replace with actual user data
+                });
+                const data = await response.json();
+                return data.jwtToken; // Assume server returns { jwtToken: "..." }
+            } catch (err) {
+                console.error('Error fetching JWT:', err);
+                return null;
+            }
+        }
+
+        // Add event listeners for user verification
+        window.addEventListener('onEmbeddedMessagingReady', async () => {
+            console.log('Embedded Messaging API is ready.');
+            // Fetch JWT from server
+            const jwtToken = await fetchJwtToken();
+            if (jwtToken) {
+                try {
+                    embeddedservice_bootstrap.userVerificationAPI.setIdentityToken({
+                        identityTokenType: 'JWT',
+                        identityToken: jwtToken
+                    });
+                    console.log('Identity token set successfully.');
+                    proactiveChat.setVerified(true); // Mark user as verified
+                    // Create the proactive chat modal now that user is verified
+                    proactiveChat.createProactiveChat();
+                } catch (err) {
+                    console.error('Error setting identity token:', err);
+                    proactiveChat.setVerified(false);
+                }
+            } else {
+                console.error('No JWT token available for verification.');
+                proactiveChat.setVerified(false);
+            }
         });
 
-        // Optional: Simulate logout after 30 seconds for testing
-        setTimeout(() => {
-            console.log('[DEBUG] [2025-08-26 16:58 EDT] Simulating logout...');
-            if (proactiveChat) {
-                proactiveChat.clearSession();
+        window.addEventListener('onEmbeddedMessagingIdentityTokenExpired', async () => {
+            console.log('Identity token has expired.');
+            // Fetch a new JWT token within 30 seconds to keep the session active
+            const newJwtToken = await fetchJwtToken();
+            if (newJwtToken) {
+                try {
+                    embeddedservice_bootstrap.userVerificationAPI.setIdentityToken({
+                        identityTokenType: 'JWT',
+                        identityToken: newJwtToken
+                    });
+                    console.log('New identity token set.');
+                    proactiveChat.setVerified(true);
+                } catch (err) {
+                    console.error('Error setting new identity token:', err);
+                    proactiveChat.setVerified(false);
+                }
+            } else {
+                console.error('Failed to renew JWT token.');
+                // Session will auto-clear after 30 seconds if no new token is provided
+                proactiveChat.setVerified(false);
             }
-        }, 30000);
+        });
+
+        // Function to handle user logout
+        function handleUserLogout() {
+            try {
+                embeddedservice_bootstrap.userVerificationAPI.clearSession({
+                    shouldEndSession: true
+                });
+                console.log('Session cleared on logout.');
+                proactiveChat.setVerified(false);
+                proactiveChat.hideProactiveChat(); // Hide modal on logout
+            } catch (err) {
+                console.error('Error clearing session:', err);
+            }
+        }
+
+        // Initialize proactive chat on DOMContentLoaded
+        let proactiveChat; // Declare globally for access in event listeners
+        document.addEventListener('DOMContentLoaded', function () {
+            loadExternalScript('https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250/assets/js/bootstrap.min.js', function () {
+                console.log('External script loaded.');
+                initProactive();
+            });
+        });
+
+        // Initialize proactive chat
+        function initProactive() {
+            try {
+                const chatLogo = 'ImageLogo'; // Placeholder, not used in UI
+                const chatDelay = 5000; // 5-second delay
+                proactiveChat = new ProactiveChat(chatLogo, chatDelay, 'Cancel', 'Chat');
+                proactiveChat.initEmbeddedProactiveMessaging(
+                    '00DgL00000098b7',
+                    'githubPOC',
+                    'https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250',
+                    'https://orgfarm-699ab99d32-dev-ed.develop.my.salesforce-scrt.com'
+                );
+            } catch (err) {
+                console.error('Error initializing proactive chat:', err);
+            }
+        }
     </script>
 </body>
 </html>
