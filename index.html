@@ -65,6 +65,16 @@
                 );
             }
         });
+        window.addEventListener("onEmbeddedMessagingReady", () => {
+  console.log("Received the onEmbeddedMessagingReady event.");
+
+  //Add more code here.
+});
+window.addEventListener("onEmbeddedMessagingIdentityTokenExpired", () => {
+  console.log("Received the onEmbeddedMessagingIdentityTokenExpired event.");
+
+  //Add more code here.
+});
     </script>
 
 </body>
