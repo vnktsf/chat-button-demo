@@ -24,10 +24,20 @@
         .chat-button:hover {
             background-color: #005fb2;
         }
-        .embeddedMessagingIconContainer, .embeddedMessagingIconContainer *, .embeddedMessagingIconContainer svg, .embeddedMessagingIconContainer div, .embeddedMessagingIconContainer svg path {
+        .embeddedMessagingIconContainer, 
+        .embeddedMessagingIconContainer *,
+        .embeddedMessagingIconContainer svg,
+        .embeddedMessagingIconContainer div,
+        .embeddedMessagingIconContainer svg path,
+        .embeddedMessagingIconContainer[style],
+        .embeddedMessagingIconContainer:active,
+        .embeddedMessagingIconContainer:focus {
             background-color: #00FF00 !important;
             fill: #000000 !important;
             color: #000000 !important;
+            --eswHeaderColor: #00FF00 !important; /* Added to match DevTools fix */
+            border: none !important;
+            box-shadow: none !important;
         }
     </style>
 </head>
@@ -47,7 +57,10 @@
                     iconColor: '#000000',
                     primaryColor: '#00FF00',
                     chatButtonBackgroundColor: '#00FF00',
-                    conversationButtonBackgroundColor: '#00FF00'
+                    conversationButtonBackgroundColor: '#00FF00',
+                    buttonActiveBackgroundColor: '#00FF00',
+                    buttonActiveIconColor: '#000000',
+                    '--eswHeaderColor': '#00FF00' /* Added to match DevTools fix */
                 };
                 console.log('themingOverrides applied:', embeddedservice_bootstrap.settings.themingOverrides);
             } catch (err) {
