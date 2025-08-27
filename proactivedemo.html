@@ -24,8 +24,11 @@
 
                 // Style chat button/icon
                 embeddedservice_bootstrap.settings.themingOverrides = {
-                    brandColor: '#FF0000' // Red for chat button
+                    brandColor: '#FF0000', // Red for chat button
+                    buttonBackgroundColor: '#FF0000', // Ensure icon background
+                    buttonIconColor: '#FFFFFF' // White icon for contrast
                 };
+                console.log('themingOverrides applied:', embeddedservice_bootstrap.settings.themingOverrides);
 
                 // Initialize the chat
                 embeddedservice_bootstrap.init(
