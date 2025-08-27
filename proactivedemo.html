@@ -22,6 +22,14 @@
             try {
                 embeddedservice_bootstrap.settings.language = 'en_US';
 
+                // 🎨 Apply green branding dynamically
+                embeddedservice_bootstrap.settings.styles = {
+                    primaryColor: '#16A34A',      // Main green color
+                    headerColor: '#16A34A',       // Header bar
+                    buttonColor: '#16A34A',       // Buttons
+                    secondaryColor: '#ffffff'     // Text/icons for contrast
+                };
+
                 // Initialize the chat immediately
                 embeddedservice_bootstrap.init(
                     '00DgL00000098b7',
