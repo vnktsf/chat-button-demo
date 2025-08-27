@@ -11,20 +11,6 @@
             margin: 50px;
             background-color: #f0f0f0;
         }
-
-        /* ✅ Force chat button & header to green */
-        .embeddedMessagingFrame .embeddedMessagingIcon,
-        .embeddedMessagingFrame header,
-        .embeddedMessagingFrame .embeddedMessagingButton {
-            background-color: #16A34A !important;
-            border-color: #16A34A !important;
-        }
-
-        .embeddedMessagingFrame .embeddedMessagingButton,
-        .embeddedMessagingFrame header h2,
-        .embeddedMessagingFrame header button {
-            color: #ffffff !important; /* make text white for contrast */
-        }
     </style>
 </head>
 <body>
@@ -36,6 +22,17 @@
             try {
                 embeddedservice_bootstrap.settings.language = 'en_US';
 
+                // ✅ Apply dynamic theming overrides
+                // (you can make this domain-based if you want different colors per site)
+                embeddedservice_bootstrap.settings.themingOverrides = {
+                    "brandColor": "#16A34A",              // primary branding (buttons, header)
+                    "textMessageBubbleColor": "#16A34A",  // customer message bubble
+                    "textMessageColor": "#FFFFFF",        // customer text color
+                    "agentMessageBubbleColor": "#F3F4F6", // agent bubble
+                    "agentMessageColor": "#111827"        // agent text color
+                };
+
+                // Initialize the chat
                 embeddedservice_bootstrap.init(
                     '00DgL00000098b7',
                     'githubPOC',
@@ -48,11 +45,13 @@
                 // Launch the chat automatically after a short delay
                 setTimeout(() => {
                     if (typeof embeddedservice_bootstrap.utilAPI !== 'undefined') {
-                        embeddedservice_bootstrap.utilAPI.launchChat().then(success => {
-                            console.log('Chat launched successfully:', success);
-                        }).catch(error => {
-                            console.error('Error launching chat:', error);
-                        });
+                        embeddedservice_bootstrap.utilAPI.launchChat()
+                            .then(success => {
+                                console.log('Chat launched successfully:', success);
+                            })
+                            .catch(error => {
+                                console.error('Error launching chat:', error);
+                            });
                     } else {
                         console.error('Embedded Messaging utilAPI not available.');
                     }
@@ -63,6 +62,9 @@
             }
         };
     </script>
-    <script type='text/javascript' src='https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+
+    <script type='text/javascript' 
+            src='https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250/assets/js/bootstrap.min.js' 
+            onload='initEmbeddedMessaging()'></script>
 </body>
 </html>
