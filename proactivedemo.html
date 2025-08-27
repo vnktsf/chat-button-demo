@@ -11,6 +11,11 @@
             margin: 50px;
             background-color: #f0f0f0;
         }
+        /* Fallback for icon styling */
+        .embeddedMessagingIconContainer {
+            background-color: #FF0000 !important;
+            fill: #FFFFFF !important;
+        }
     </style>
 </head>
 <body>
@@ -24,9 +29,10 @@
 
                 // Style chat button/icon
                 embeddedservice_bootstrap.settings.themingOverrides = {
-                    brandColor: '#FF0000', // Red for chat button
-                    buttonBackgroundColor: '#FF0000', // Ensure icon background
-                    buttonIconColor: '#FFFFFF' // White icon for contrast
+                    brandColor: '#FF0000',
+                    buttonBackgroundColor: '#FF0000',
+                    buttonIconColor: '#FFFFFF',
+                    iconColor: '#FFFFFF' // Additional property for SVG
                 };
                 console.log('themingOverrides applied:', embeddedservice_bootstrap.settings.themingOverrides);
 
