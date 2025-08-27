@@ -32,7 +32,7 @@
                     }
                 );
 
-                // Launch the chat automatically after a short delay
+                // Launch the chat after a delay
                 setTimeout(() => {
                     if (typeof embeddedservice_bootstrap.utilAPI !== 'undefined') {
                         embeddedservice_bootstrap.utilAPI.launchChat()
@@ -45,7 +45,7 @@
                     } else {
                         console.error('Embedded Messaging utilAPI not available.');
                     }
-                }, 2000); // Increased delay to ensure script loads
+                }, 3000);
             } catch (err) {
                 console.error('Error initializing Embedded Messaging: ', err);
             }
