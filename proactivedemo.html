@@ -11,6 +11,20 @@
             margin: 50px;
             background-color: #f0f0f0;
         }
+
+        /* ✅ Force chat button & header to green */
+        .embeddedMessagingFrame .embeddedMessagingIcon,
+        .embeddedMessagingFrame header,
+        .embeddedMessagingFrame .embeddedMessagingButton {
+            background-color: #16A34A !important;
+            border-color: #16A34A !important;
+        }
+
+        .embeddedMessagingFrame .embeddedMessagingButton,
+        .embeddedMessagingFrame header h2,
+        .embeddedMessagingFrame header button {
+            color: #ffffff !important; /* make text white for contrast */
+        }
     </style>
 </head>
 <body>
@@ -22,15 +36,6 @@
             try {
                 embeddedservice_bootstrap.settings.language = 'en_US';
 
-                // 🎨 Apply green branding dynamically
-                embeddedservice_bootstrap.settings.styles = {
-                    primaryColor: '#16A34A',      // Main green color
-                    headerColor: '#16A34A',       // Header bar
-                    buttonColor: '#16A34A',       // Buttons
-                    secondaryColor: '#ffffff'     // Text/icons for contrast
-                };
-
-                // Initialize the chat immediately
                 embeddedservice_bootstrap.init(
                     '00DgL00000098b7',
                     'githubPOC',
@@ -51,7 +56,7 @@
                     } else {
                         console.error('Embedded Messaging utilAPI not available.');
                     }
-                }, 1000); // 1-second delay to ensure initialization completes
+                }, 1000);
 
             } catch (err) {
                 console.error('Error initializing Embedded Messaging: ', err);
