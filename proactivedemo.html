@@ -26,15 +26,19 @@
         function initEmbeddedMessaging() {
             try {
                 embeddedservice_bootstrap.settings.language = 'en_US';
-
-                // Style chat button/icon
-                embeddedservice_bootstrap.settings.themingOverrides = {
-                    brandColor: '#FF0000',
-                    buttonBackgroundColor: '#FF0000',
-                    buttonIconColor: '#FFFFFF',
-                    iconColor: '#FFFFFF' // Additional property for SVG
-                };
-                console.log('themingOverrides applied:', embeddedservice_bootstrap.settings.themingOverrides);
+                window.addEventListener("onEmbeddedMessagingReady", e => {
+                embeddedservice_bootstrap.prechatAPI.setVisiblePrechatFields({
+                    "_firstName": {
+                        "value": "Test",
+                        "isEditableByEndUser": false
+                    },
+                    "_lastName": {
+                        "value": "User",
+                        "isEditableByEndUser": false
+                    }
+                });
+            });
+                
 
                 // Initialize the chat
                 embeddedservice_bootstrap.init(
