@@ -93,6 +93,16 @@
         User_Agent: visitorData.User_Agent
       });
 
+       embeddedservice_bootstrap.prechatAPI.setVisiblePrechatFields({
+            // List the pre-chat field names with the value and whether
+            // it's editable in the pre-chat form.
+            "_firstName": {
+              "value": "Jane",
+              "isEditableByEndUser": false
+            }
+       });
+         
+
       console.log("Prechat fields set:", {
         Browser: visitorData.Browser,
         User_Agent: visitorData.User_Agent
