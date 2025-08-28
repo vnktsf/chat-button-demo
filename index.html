@@ -1,94 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Click-to-Chat Example</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            text-align: center;
-            margin: 50px;
-            background-color: #f0f0f0;
-        }
-        .chat-button {
-            padding: 15px 30px;
-            font-size: 18px;
-            color: #fff;
-            background-color: #0070d2; /* Salesforce blue */
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .chat-button:hover {
-            background-color: #005fb2;
-        }
-        .embeddedMessagingIconContainer, 
-        .embeddedMessagingIconContainer *,
-        .embeddedMessagingIconContainer svg,
-        .embeddedMessagingIconContainer div,
-        .embeddedMessagingIconContainer svg path,
-        .embeddedMessagingIconContainer[style],
-        .embeddedMessagingIconContainer:active,
-        .embeddedMessagingIconContainer:focus {
-            background-color: #00FF00 !important;
-            fill: #000000 !important;
-            color: #000000 !important;
-            HeaderColor: #00FF00 !important; /* Added to match DevTools fix */
-            border: none !important;
-            box-shadow: none !important;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Click-to-Chat Example</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin: 50px;
+      background-color: #f0f0f0;
+    }
+    .chat-button {
+      padding: 15px 30px;
+      font-size: 18px;
+      color: #fff;
+      background-color: #0070d2;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .chat-button:hover {
+      background-color: #005fb2;
+    }
+    #visitor-info {
+      margin-top: 30px;
+      text-align: left;
+      display: inline-block;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+  </style>
 </head>
 <body>
-    <h1>Welcome to My Website!</h1>
-    <p>Click the button below to start a conversation with us.</p>
-    <button id="openChatButton" class="chat-button">Open Chat</button>
+  <h1>Welcome to My Website!</h1>
+  <p>Click the button below to start a conversation with us.</p>
+  <button id="openChatButton" class="chat-button">Open Chat</button>
 
-    <script type='text/javascript'>
-        function initEmbeddedMessaging() {
-            try {
-                embeddedservice_bootstrap.settings.language = 'en_US';
-                embeddedservice_bootstrap.settings.themingOverrides = {
-                    brandColor: '#00FF00',
-                    buttonBackgroundColor: '#00FF00',
-                    buttonIconColor: '#000000',
-                    iconColor: '#000000',
-                    primaryColor: '#00FF00',
-                    chatButtonBackgroundColor: '#00FF00',
-                    conversationButtonBackgroundColor: '#00FF00',
-                    buttonActiveBackgroundColor: '#00FF00',
-                    buttonActiveIconColor: '#000000',
-                    HeaderColor: '#00FF00' 
-                };
-                console.log('themingOverrides applied:', embeddedservice_bootstrap.settings.themingOverrides);
-            } catch (err) {
-                console.error('Error loading Embedded Messaging: ', err);
-            }
-        }
-    </script>
-    <script type='text/javascript' src='https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+  <div id="visitor-info">
+    <h2>Visitor Information</h2>
+    <p><b>Browser:</b> <span id="browser"></span></p>
+    <p><b>Browser Language:</b> <span id="language"></span></p>
+    <p><b>Referring Site:</b> <span id="referrer"></span></p>
+    <p><b>Visitor IP Address:</b> <span id="ip"></span></p>
+    <p><b>User Agent:</b> <span id="userAgent"></span></p>
+    <p><b>Platform:</b> <span id="platform"></span></p>
+    <p><b>Screen Resolution:</b> <span id="resolution"></span></p>
+  </div>
 
-    <script type="text/javascript">
-        document.getElementById('openChatButton').addEventListener('click', function() {
-            if (typeof embeddedservice_bootstrap !== 'undefined') {
-                embeddedservice_bootstrap.init(
-                    '00DgL00000098b7',
-                    'githubPOC',
-                    'https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250',
-                    {
-                        scrt2URL: 'https://orgfarm-699ab99d32-dev-ed.develop.my.salesforce-scrt.com'
-                    }
-                );
-            }
-        });
-        window.addEventListener("onEmbeddedMessagingReady", () => {
-            console.log("Received the onEmbeddedMessagingReady event.");
-        });
-        window.addEventListener("onEmbeddedMessagingIdentityTokenExpired", () => {
-            console.log("Received the onEmbeddedMessagingIdentityTokenExpired event.");
-        });
-    </script>
+  <script>
+    // Fill fields
+    document.getElementById("browser").textContent = navigator.appName + " (" + navigator.appVersion + ")";
+    document.getElementById("language").textContent = navigator.language || navigator.userLanguage;
+    document.getElementById("referrer").textContent = document.referrer || "Direct / None";
+    document.getElementById("userAgent").textContent = navigator.userAgent;
+    document.getElementById("platform").textContent = navigator.platform;
+    document.getElementById("resolution").textContent = window.screen.width + " x " + window.screen.height;
+
+    // Get IP address via public API
+    fetch("https://api.ipify.org?format=json")
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("ip").textContent = data.ip;
+      })
+      .catch(() => {
+        document.getElementById("ip").textContent = "Unavailable";
+      });
+  </script>
+
+  <!-- your Salesforce embedded chat scripts remain untouched -->
+  <script type='text/javascript'>
+    function initEmbeddedMessaging() {
+      try {
+        embeddedservice_bootstrap.settings.language = 'en_US';
+        embeddedservice_bootstrap.settings.themingOverrides = {
+          brandColor: '#00FF00',
+          buttonBackgroundColor: '#00FF00',
+          buttonIconColor: '#000000',
+          iconColor: '#000000',
+          primaryColor: '#00FF00',
+          chatButtonBackgroundColor: '#00FF00',
+          conversationButtonBackgroundColor: '#00FF00',
+          buttonActiveBackgroundColor: '#00FF00',
+          buttonActiveIconColor: '#000000',
+          HeaderColor: '#00FF00' 
+        };
+      } catch (err) {
+        console.error('Error loading Embedded Messaging: ', err);
+      }
+    }
+  </script>
+  <script type='text/javascript' src='https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+
+  <script type="text/javascript">
+    document.getElementById('openChatButton').addEventListener('click', function() {
+      if (typeof embeddedservice_bootstrap !== 'undefined') {
+        embeddedservice_bootstrap.init(
+          '00DgL00000098b7',
+          'githubPOC',
+          'https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250',
+          {
+            scrt2URL: 'https://orgfarm-699ab99d32-dev-ed.develop.my.salesforce-scrt.com'
+          }
+        );
+      }
+    });
+  </script>
 </body>
 </html>
