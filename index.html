@@ -109,16 +109,12 @@ function setPrechatFields() {
   if (!embeddedservice_bootstrap.prechatAPI) return;
 
   const visibleFields = {
-    Email_Address: {
+    _firstName: {
       value: document.getElementById("email").value || "",
       isEditableByEndUser: true
     },
-    Marketing_Email_UID: {
+    _lastName: {
       value: document.getElementById("marketing_uid").value || "",
-      isEditableByEndUser: true
-    },
-    Campaign_Information: {
-      value: document.getElementById("campaign_info").value || "",
       isEditableByEndUser: true
     }
   };
