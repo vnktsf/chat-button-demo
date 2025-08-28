@@ -52,26 +52,55 @@
   </div>
 
   <script>
-    // Fill fields
-    document.getElementById("browser").textContent = navigator.appName + " (" + navigator.appVersion + ")";
-    document.getElementById("language").textContent = navigator.language || navigator.userLanguage;
-    document.getElementById("referrer").textContent = document.referrer || "Direct / None";
-    document.getElementById("userAgent").textContent = navigator.userAgent;
-    document.getElementById("platform").textContent = navigator.platform;
-    document.getElementById("resolution").textContent = window.screen.width + " x " + window.screen.height;
+    // Collect and print visitor info
+    const visitorData = {
+      Browser: navigator.appName + " (" + navigator.appVersion + ")",
+      Browser_Language: navigator.language || navigator.userLanguage,
+      Referring_Site: document.referrer || "Direct / None",
+      User_Agent: navigator.userAgent,
+      Platform: navigator.platform,
+      Screen_Resolution: window.screen.width + " x " + window.screen.height,
+      Visitor_IP_Address: "Fetching..."
+    };
 
-    // Get IP address via public API
+    document.getElementById("browser").textContent = visitorData.Browser;
+    document.getElementById("language").textContent = visitorData.Browser_Language;
+    document.getElementById("referrer").textContent = visitorData.Referring_Site;
+    document.getElementById("userAgent").textContent = visitorData.User_Agent;
+    document.getElementById("platform").textContent = visitorData.Platform;
+    document.getElementById("resolution").textContent = visitorData.Screen_Resolution;
+    document.getElementById("ip").textContent = visitorData.Visitor_IP_Address;
+
+    // Fetch IP
     fetch("https://api.ipify.org?format=json")
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById("ip").textContent = data.ip;
+      .then(r => r.json())
+      .then(d => {
+        visitorData.Visitor_IP_Address = d.ip;
+        document.getElementById("ip").textContent = d.ip;
       })
       .catch(() => {
+        visitorData.Visitor_IP_Address = "Unavailable";
         document.getElementById("ip").textContent = "Unavailable";
       });
+
+    // Wait for Embedded Messaging to be ready, then set hidden fields
+    window.addEventListener("onEmbeddedMessagingReady", () => {
+      console.log("Embedded Messaging Ready...");
+
+      // Only send Browser + User_Agent for now
+      embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+        Browser: visitorData.Browser,
+        User_Agent: visitorData.User_Agent
+      });
+
+      console.log("Prechat fields set:", {
+        Browser: visitorData.Browser,
+        User_Agent: visitorData.User_Agent
+      });
+    });
   </script>
 
-  <!-- your Salesforce embedded chat scripts remain untouched -->
+  <!-- Salesforce Embedded Messaging -->
   <script type='text/javascript'>
     function initEmbeddedMessaging() {
       try {
@@ -98,14 +127,6 @@
   <script type="text/javascript">
     document.getElementById('openChatButton').addEventListener('click', function() {
       if (typeof embeddedservice_bootstrap !== 'undefined') {
-        // Match exactly the Pre-Chat field names you defined in Setup
-        const prechatFields = {
-          Browser: navigator.appName + " (" + navigator.appVersion + ")",
-          User_Agent: navigator.userAgent
-        };
-
-    // Send to Salesforce
-    embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(prechatFields);
         embeddedservice_bootstrap.init(
           '00DgL00000098b7',
           'githubPOC',
