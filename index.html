@@ -87,7 +87,7 @@
     window.addEventListener("onEmbeddedMessagingReady", () => {
       console.log("Embedded Messaging Ready...");
 
-       Only send Browser + User_Agent for now
+      // Only send Browser + User_Agent for now
       embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
         Browser: visitorData.Browser,
         User_Agent: visitorData.User_Agent
