@@ -23,6 +23,16 @@
     <p>The chat will open automatically.</p>
 
     <script type='text/javascript'>
+         // Collect and print visitor info
+    const visitorData = {
+      Browser: navigator.appName + " (" + navigator.appVersion + ")",
+      Browser_Language: navigator.language || navigator.userLanguage,
+      Referring_Site: document.referrer || "Direct / None",
+      User_Agent: navigator.userAgent,
+      Platform: navigator.platform,
+      Screen_Resolution: window.screen.width + " x " + window.screen.height,
+      Visitor_IP_Address: "Fetching..."
+    };
         function initEmbeddedMessaging() {
             try {
                 embeddedservice_bootstrap.settings.language = 'en_US';
@@ -37,6 +47,12 @@
                         "isEditableByEndUser": false
                     }
                 });
+
+                      // Only send Browser + User_Agent for now
+      embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+        Browser: visitorData.Browser,
+        User_Agent: visitorData.User_Agent
+      }); 
             });
                 
 
