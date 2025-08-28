@@ -80,7 +80,7 @@ const visitorData = {
   Visitor_IP_Address: "Fetching..."
 };
 
-// Display automatically detected fields
+// Display info
 document.getElementById("browser").textContent = visitorData.Browser;
 document.getElementById("language").textContent = visitorData.Browser_Language;
 document.getElementById("referrer").textContent = visitorData.Referring_Site;
@@ -104,49 +104,42 @@ fetch("https://api.ipify.org?format=json")
     document.getElementById("ip").textContent = "Unavailable";
   });
 
-// Salesforce Embedded Messaging: send pre-chat fields when ready
+// Embedded Messaging ready
 window.addEventListener("onEmbeddedMessagingReady", () => {
   console.log("Embedded Messaging Ready...");
 
-  // Collect input field values
-  const email = document.getElementById("email").value || "";
-  const marketing_uid = document.getElementById("marketing_uid").value || "";
-  const campaign_info = document.getElementById("campaign_info").value || "";
-
-  // Combine all pre-chat fields
-  const prechatFields = {
-    Email_Address: email,
-    Marketing_Email_UID: marketing_uid,
-    Campaign_Information: campaign_info,
-    Web_Url: visitorData.Web_Url,
-    Chat_Origin: visitorData.Chat_Origin,
-    EngagementType: visitorData.EngagementType,
-    Browser: visitorData.Browser,
-    Browser_Language: visitorData.Browser_Language,
-    Referring_Site: visitorData.Referring_Site,
-    Visitor_IP_Address: visitorData.Visitor_IP_Address,
-    User_Agent: visitorData.User_Agent,
-    Platform: visitorData.Platform,
-    Screen_Resolution: visitorData.Screen_Resolution
+  // Prepopulate visible fields (editable by user)
+  const visibleFields = {
+    _firstName: {
+      value: document.getElementById("email").value || "",
+      isEditableByEndUser: true
+    },
+    _lastName: {
+      value: document.getElementById("marketing_uid").value || "",
+      isEditableByEndUser: false
+    }
   };
 
-  embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(prechatFields);
-  console.log("Prechat fields hidden set:", prechatFields);
+  // Hidden fields (internal tracking)
+  const hiddenFields = {
+    Browser: visitorData.Browser,
+    //Browser_Language: visitorData.Browser_Language,
+  //  Referring_Site: visitorData.Referring_Site,
+ //   Visitor_IP_Address: visitorData.Visitor_IP_Address,
+    User_Agent: visitorData.User_Agent,
+    //Platform: visitorData.Platform,
+   // Screen_Resolution: visitorData.Screen_Resolution,
+  //  Web_Url: visitorData.Web_Url,
+  //  Chat_Origin: visitorData.Chat_Origin,
+  //  EngagementType: visitorData.EngagementType
+  };
 
-  embeddedservice_bootstrap.prechatAPI.setVisiblePrechatFields({
-    // List the pre-chat field names with the value and whether
-    // it's editable in the pre-chat form.
-    "_firstName": {
-      "value": "Jane",
-      "isEditableByEndUser": false
-    },
-    "_lastName": {
-      "value": email,
-      "isEditableByEndUser": true
-    }
-  });
-
-  
+  // Set pre-chat fields
+  if (embeddedservice_bootstrap.prechatAPI) {
+    embeddedservice_bootstrap.prechatAPI.setVisiblePrechatFields(visibleFields);
+    embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
+    console.log("Prechat fields set:", { visibleFields, hiddenFields });
+  }
 });
 
 // Initialize chat on button click
@@ -160,6 +153,8 @@ document.getElementById('openChatButton').addEventListener('click', function() {
         scrt2URL: 'https://orgfarm-699ab99d32-dev-ed.develop.my.salesforce-scrt.com'
       }
     );
+  } else {
+    console.error("embeddedservice_bootstrap is not loaded yet!");
   }
 });
 </script>
