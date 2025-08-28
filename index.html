@@ -104,57 +104,62 @@ fetch("https://api.ipify.org?format=json")
     document.getElementById("ip").textContent = "Unavailable";
   });
 
-// Embedded Messaging ready
-window.addEventListener("onEmbeddedMessagingReady", () => {
-  console.log("Embedded Messaging Ready...");
+// Reusable function to set prechat fields
+function setPrechatFields() {
+  if (!embeddedservice_bootstrap.prechatAPI) return;
 
-  // Prepopulate visible fields (editable by user)
   const visibleFields = {
-    _firstName: {
+    Email_Address: {
       value: document.getElementById("email").value || "",
       isEditableByEndUser: true
     },
-    _lastName: {
+    Marketing_Email_UID: {
       value: document.getElementById("marketing_uid").value || "",
-      isEditableByEndUser: false
+      isEditableByEndUser: true
+    },
+    Campaign_Information: {
+      value: document.getElementById("campaign_info").value || "",
+      isEditableByEndUser: true
     }
   };
 
-  // Hidden fields (internal tracking)
   const hiddenFields = {
     Browser: visitorData.Browser,
-    //Browser_Language: visitorData.Browser_Language,
-  //  Referring_Site: visitorData.Referring_Site,
- //   Visitor_IP_Address: visitorData.Visitor_IP_Address,
+    Browser_Language: visitorData.Browser_Language,
+    Referring_Site: visitorData.Referring_Site,
+    Visitor_IP_Address: visitorData.Visitor_IP_Address,
     User_Agent: visitorData.User_Agent,
-    //Platform: visitorData.Platform,
-   // Screen_Resolution: visitorData.Screen_Resolution,
-  //  Web_Url: visitorData.Web_Url,
-  //  Chat_Origin: visitorData.Chat_Origin,
-  //  EngagementType: visitorData.EngagementType
+    Platform: visitorData.Platform,
+    Screen_Resolution: visitorData.Screen_Resolution,
+    Web_Url: visitorData.Web_Url,
+    Chat_Origin: visitorData.Chat_Origin,
+    EngagementType: visitorData.EngagementType
   };
 
-  // Set pre-chat fields
-  if (embeddedservice_bootstrap.prechatAPI) {
-    embeddedservice_bootstrap.prechatAPI.setVisiblePrechatFields(visibleFields);
-    embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
-    console.log("Prechat fields set:", { visibleFields, hiddenFields });
-  }
-});
+  embeddedservice_bootstrap.prechatAPI.setVisiblePrechatFields(visibleFields);
+  embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(hiddenFields);
+
+  console.log("Prechat fields set:", { visibleFields, hiddenFields });
+}
 
 // Initialize chat on button click
 document.getElementById('openChatButton').addEventListener('click', function() {
   if (typeof embeddedservice_bootstrap !== 'undefined') {
+
+    // Setup prechat fields when library is ready
+    window.addEventListener("onEmbeddedMessagingReady", setPrechatFields, { once: true });
+
+    // Initialize chat
     embeddedservice_bootstrap.init(
-      '00DgL00000098b7',
-      'githubPOC',
+      '00DgL00000098b7', // Org ID
+      'githubPOC',       // Deployment Name
       'https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250',
       {
         scrt2URL: 'https://orgfarm-699ab99d32-dev-ed.develop.my.salesforce-scrt.com'
       }
     );
   } else {
-    console.error("embeddedservice_bootstrap is not loaded yet!");
+    console.warn("embeddedservice_bootstrap is not loaded yet!");
   }
 });
 </script>
