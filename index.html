@@ -1,142 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Click-to-Chat Example</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      margin: 50px;
-      background-color: #f0f0f0;
-    }
-    .chat-button {
-      padding: 15px 30px;
-      font-size: 18px;
-      color: #fff;
-      background-color: #0070d2;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    .chat-button:hover {
-      background-color: #005fb2;
-    }
-    #visitor-info {
-      margin-top: 30px;
-      text-align: left;
-      display: inline-block;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Click-to-Chat Example</title>
+<style>
+body {
+  font-family: sans-serif;
+  text-align: center;
+  margin: 50px;
+  background-color: #f0f0f0;
+}
+.chat-button {
+  padding: 15px 30px;
+  font-size: 18px;
+  color: #fff;
+  background-color: #0070d2;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.chat-button:hover {
+  background-color: #005fb2;
+}
+#visitor-info {
+  margin-top: 30px;
+  text-align: left;
+  display: inline-block;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+#visitor-info input {
+  width: 300px;
+  padding: 5px;
+  margin-bottom: 10px;
+}
+</style>
 </head>
 <body>
-  <h1>Welcome to My Website!</h1>
-  <p>Click the button below to start a conversation with us.</p>
-  <button id="openChatButton" class="chat-button">Open Chat</button>
+<h1>Welcome to My Website!</h1>
+<p>Click the button below to start a conversation with us.</p>
 
-  <div id="visitor-info">
-    <h2>Visitor Information</h2>
-    <p><b>Browser:</b> <span id="browser"></span></p>
-    <p><b>Browser Language:</b> <span id="language"></span></p>
-    <p><b>Referring Site:</b> <span id="referrer"></span></p>
-    <p><b>Visitor IP Address:</b> <span id="ip"></span></p>
-    <p><b>User Agent:</b> <span id="userAgent"></span></p>
-    <p><b>Platform:</b> <span id="platform"></span></p>
-    <p><b>Screen Resolution:</b> <span id="resolution"></span></p>
-  </div>
+<div id="visitor-info">
+  <h2>Visitor Information</h2>
 
-  <script>
-    // Collect and print visitor info
-    const visitorData = {
-      Browser: navigator.appName + " (" + navigator.appVersion + ")",
-      Browser_Language: navigator.language || navigator.userLanguage,
-      Referring_Site: document.referrer || "Direct / None",
-      User_Agent: navigator.userAgent,
-      Platform: navigator.platform,
-      Screen_Resolution: window.screen.width + " x " + window.screen.height,
-      Visitor_IP_Address: "Fetching..."
-    };
+  <p>Email Address:<br><input type="email" id="email" placeholder="Enter your email"></p>
+  <p>Marketing Email UID:<br><input type="text" id="marketing_uid" placeholder="Enter UID"></p>
+  <p>Campaign Information:<br><input type="text" id="campaign_info" placeholder="Enter Campaign Info"></p>
 
-    document.getElementById("browser").textContent = visitorData.Browser;
-    document.getElementById("language").textContent = visitorData.Browser_Language;
-    document.getElementById("referrer").textContent = visitorData.Referring_Site;
-    document.getElementById("userAgent").textContent = visitorData.User_Agent;
-    document.getElementById("platform").textContent = visitorData.Platform;
-    document.getElementById("resolution").textContent = visitorData.Screen_Resolution;
-    document.getElementById("ip").textContent = visitorData.Visitor_IP_Address;
+  <p><b>Web URL:</b> <span id="web_url"></span></p>
+  <p><b>Chat Origin:</b> <span id="chat_origin"></span></p>
+  <p><b>Engagement Type:</b> <span id="engagement_type"></span></p>
+  <p><b>Browser:</b> <span id="browser"></span></p>
+  <p><b>Browser Language:</b> <span id="language"></span></p>
+  <p><b>Referring Site:</b> <span id="referrer"></span></p>
+  <p><b>Visitor IP Address:</b> <span id="ip"></span></p>
+  <p><b>User Agent:</b> <span id="userAgent"></span></p>
+  <p><b>Platform:</b> <span id="platform"></span></p>
+  <p><b>Screen Resolution:</b> <span id="resolution"></span></p>
+</div>
 
-    // Fetch IP
-    fetch("https://api.ipify.org?format=json")
-      .then(r => r.json())
-      .then(d => {
-        visitorData.Visitor_IP_Address = d.ip;
-        document.getElementById("ip").textContent = d.ip;
-      })
-      .catch(() => {
-        visitorData.Visitor_IP_Address = "Unavailable";
-        document.getElementById("ip").textContent = "Unavailable";
-      });
+<button id="openChatButton" class="chat-button">Open Chat</button>
 
-    // Wait for Embedded Messaging to be ready, then set hidden fields
-    window.addEventListener("onEmbeddedMessagingReady", () => {
-      console.log("Embedded Messaging Ready...");
+<script>
+// Collect visitor info
+const visitorData = {
+  Browser: navigator.appName + " (" + navigator.appVersion + ")",
+  Browser_Language: navigator.language || navigator.userLanguage,
+  Referring_Site: document.referrer || "Direct / None",
+  User_Agent: navigator.userAgent,
+  Platform: navigator.platform,
+  Screen_Resolution: window.screen.width + " x " + window.screen.height,
+  Web_Url: window.location.href,
+  Chat_Origin: "Website Chat",
+  EngagementType: "Embedded Messaging",
+  Visitor_IP_Address: "Fetching..."
+};
 
-      // Only send Browser + User_Agent for now
-      embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-        Browser: visitorData.Browser,
-        User_Agent: visitorData.User_Agent
-      });
+// Display automatically detected fields
+document.getElementById("browser").textContent = visitorData.Browser;
+document.getElementById("language").textContent = visitorData.Browser_Language;
+document.getElementById("referrer").textContent = visitorData.Referring_Site;
+document.getElementById("userAgent").textContent = visitorData.User_Agent;
+document.getElementById("platform").textContent = visitorData.Platform;
+document.getElementById("resolution").textContent = visitorData.Screen_Resolution;
+document.getElementById("web_url").textContent = visitorData.Web_Url;
+document.getElementById("chat_origin").textContent = visitorData.Chat_Origin;
+document.getElementById("engagement_type").textContent = visitorData.EngagementType;
+document.getElementById("ip").textContent = visitorData.Visitor_IP_Address;
 
-      console.log("Prechat fields set:", {
-        Browser: visitorData.Browser,
-        User_Agent: visitorData.User_Agent
-      });
-    });
-  </script>
+// Fetch IP
+fetch("https://api.ipify.org?format=json")
+  .then(r => r.json())
+  .then(d => {
+    visitorData.Visitor_IP_Address = d.ip;
+    document.getElementById("ip").textContent = d.ip;
+  })
+  .catch(() => {
+    visitorData.Visitor_IP_Address = "Unavailable";
+    document.getElementById("ip").textContent = "Unavailable";
+  });
 
-  <!-- Salesforce Embedded Messaging -->
-  <script type='text/javascript'>
-    function initEmbeddedMessaging() {
-      try {
-        embeddedservice_bootstrap.settings.language = 'en_US';
-        embeddedservice_bootstrap.settings.themingOverrides = {
-          brandColor: '#00FF00',
-          buttonBackgroundColor: '#00FF00',
-          buttonIconColor: '#000000',
-          iconColor: '#000000',
-          primaryColor: '#00FF00',
-          chatButtonBackgroundColor: '#00FF00',
-          conversationButtonBackgroundColor: '#00FF00',
-          buttonActiveBackgroundColor: '#00FF00',
-          buttonActiveIconColor: '#000000',
-          HeaderColor: '#00FF00' 
-        };
-      } catch (err) {
-        console.error('Error loading Embedded Messaging: ', err);
+// Salesforce Embedded Messaging: send pre-chat fields when ready
+window.addEventListener("onEmbeddedMessagingReady", () => {
+  console.log("Embedded Messaging Ready...");
+
+  // Collect input field values
+  const email = document.getElementById("email").value || "";
+  const marketing_uid = document.getElementById("marketing_uid").value || "";
+  const campaign_info = document.getElementById("campaign_info").value || "";
+
+  // Combine all pre-chat fields
+  const prechatFields = {
+    Email_Address: email,
+    Marketing_Email_UID: marketing_uid,
+    Campaign_Information: campaign_info,
+    Web_Url: visitorData.Web_Url,
+    Chat_Origin: visitorData.Chat_Origin,
+    EngagementType: visitorData.EngagementType,
+    Browser: visitorData.Browser,
+    Browser_Language: visitorData.Browser_Language,
+    Referring_Site: visitorData.Referring_Site,
+    Visitor_IP_Address: visitorData.Visitor_IP_Address,
+    User_Agent: visitorData.User_Agent,
+    Platform: visitorData.Platform,
+    Screen_Resolution: visitorData.Screen_Resolution
+  };
+
+  embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(prechatFields);
+  console.log("Prechat fields set:", prechatFields);
+});
+
+// Initialize chat on button click
+document.getElementById('openChatButton').addEventListener('click', function() {
+  if (typeof embeddedservice_bootstrap !== 'undefined') {
+    embeddedservice_bootstrap.init(
+      '00DgL00000098b7',
+      'githubPOC',
+      'https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250',
+      {
+        scrt2URL: 'https://orgfarm-699ab99d32-dev-ed.develop.my.salesforce-scrt.com'
       }
-    }
-  </script>
-  <script type='text/javascript' src='https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
-
-  <script type="text/javascript">
-    document.getElementById('openChatButton').addEventListener('click', function() {
-      if (typeof embeddedservice_bootstrap !== 'undefined') {
-        embeddedservice_bootstrap.init(
-          '00DgL00000098b7',
-          'githubPOC',
-          'https://orgfarm-699ab99d32-dev-ed.develop.my.site.com/ESWgithubPOC1755783616250',
-          {
-            scrt2URL: 'https://orgfarm-699ab99d32-dev-ed.develop.my.salesforce-scrt.com'
-          }
-        );
-      }
-    });
-  </script>
-</body>
-</html>
+    );
+  }
+});
+</script>
