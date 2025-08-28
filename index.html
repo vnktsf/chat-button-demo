@@ -98,6 +98,14 @@
   <script type="text/javascript">
     document.getElementById('openChatButton').addEventListener('click', function() {
       if (typeof embeddedservice_bootstrap !== 'undefined') {
+        // Match exactly the Pre-Chat field names you defined in Setup
+        const prechatFields = {
+          Browser: navigator.appName + " (" + navigator.appVersion + ")",
+          User_Agent: navigator.userAgent
+        };
+
+    // Send to Salesforce
+    embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields(prechatFields);
         embeddedservice_bootstrap.init(
           '00DgL00000098b7',
           'githubPOC',
